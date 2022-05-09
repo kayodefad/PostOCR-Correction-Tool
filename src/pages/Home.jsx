@@ -103,11 +103,11 @@ const Home = () => {
 					classNames='flex items-center justify-center'
 				>
 					<div className='relative'>
-						<div className='w-[500px] h-[400px] bg-white p-5 overflow-auto'>
-							<h3 className='text-center mb-3 text-gray-700'>
-								April 1964 Images
+						<div className='w-[700px] h-[400px] bg-white p-5 overflow-auto'>
+							<h3 className='text-center mb-3 text-gray-700 font-semibold'>
+								{`${urlParams.month.toUpperCase()} ${urlParams.year} IMAGES`}
 							</h3>
-							<div className='grid grid-cols-4 gap-4'>
+							<div className='grid grid-cols-5 gap-4'>
 								{imageList.map((el, i) => {
 									return (
 										<div

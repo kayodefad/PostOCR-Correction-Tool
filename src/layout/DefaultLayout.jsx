@@ -5,7 +5,7 @@ const DefaultLayout = () => {
 	return (
 		<>
 			<Header />
-			<div className='mt-8 px-20 mx-auto'>
+			<div className='mt-8 px-20 mx-auto overflow-auto'>
 				<Outlet />
 			</div>
 		</>

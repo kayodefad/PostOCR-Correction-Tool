@@ -8,6 +8,7 @@ const Result = () => {
 	const [searchParams] = useSearchParams();
 	const [data, setData] = useState(null);
 	const [loading, setLoading] = useState(false);
+	let allTables = [];
 
 	useEffect(() => {
 		const { year, month, page } = Object.fromEntries([...searchParams]);
@@ -22,7 +23,6 @@ const Result = () => {
 						image: page,
 					}
 				);
-				console.log(response.data);
 				setData(response.data);
 				setLoading(false);
 			} catch (error) {
@@ -33,12 +33,16 @@ const Result = () => {
 		fetchData();
 	}, [searchParams]);
 
+	if (data) {
+		allTables = Object.entries(data.tables);
+	}
+
 	return (
-		<>
+		<div>
 			{loading && <Loading />}
 			{data && (
-				<>
-					<div className='w-1/2'>
+				<div className='w-full'>
+					<div className='fixed w-[40%]'>
 						<TransformWrapper
 							initialScale={1}
 							initialPositionX={0}
@@ -66,7 +70,7 @@ const Result = () => {
 											RESET
 										</button>
 									</div>
-									<div className='border border-[#1e3a8a]'>
+									<div className='border'>
 										<TransformComponent>
 											<img
 												className='w-full'
@@ -79,9 +83,41 @@ const Result = () => {
 							)}
 						</TransformWrapper>
 					</div>
-				</>
+					{/* Tables */}
+					<div className='ml-[50%] w-[50%] overflow-auto'>
+						{allTables.map((table, i) => {
+							return (
+								<div key={i} className='border mb-4 overflow-auto'>
+									<h3 className='text-md text-center my-2 font-semibold'>
+										Table {i + 1}
+									</h3>
+									<table>
+										<tbody>
+											{table[1].map((tab, i) => {
+												return (
+													<tr key={i}>
+														{tab.map((t, i) => {
+															return (
+																<td
+																	key={i}
+																	className='border border-[#ddd] p-2 text-xs'
+																>
+																	{t}
+																</td>
+															);
+														})}
+													</tr>
+												);
+											})}
+										</tbody>
+									</table>
+								</div>
+							);
+						})}
+					</div>
+				</div>
 			)}
-		</>
+		</div>
 	);
 };
 

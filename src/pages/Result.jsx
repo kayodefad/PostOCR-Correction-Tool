@@ -3,12 +3,13 @@ import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Loading from '../components/Loading';
+import { CSVLink } from 'react-csv';
 
 const Result = () => {
 	const [searchParams] = useSearchParams();
 	const [data, setData] = useState(null);
 	const [loading, setLoading] = useState(false);
-	let allTables = [];
+	const [allTables, setAllTables] = useState([]);
 
 	useEffect(() => {
 		const { year, month, page } = Object.fromEntries([...searchParams]);
@@ -24,6 +25,7 @@ const Result = () => {
 					}
 				);
 				setData(response.data);
+				setAllTables(Object.entries(response.data.tables));
 				setLoading(false);
 			} catch (error) {
 				setLoading(false);
@@ -33,9 +35,13 @@ const Result = () => {
 		fetchData();
 	}, [searchParams]);
 
-	if (data) {
-		allTables = Object.entries(data.tables);
-	}
+	const handleChange = (e, tableIndex, tabRow, cellValue) => {
+		const currentTables = [...allTables];
+		currentTables[tableIndex][1][tabRow][cellValue] = e.target.value;
+		setAllTables(currentTables);
+	};
+
+	const { year, month, page } = Object.fromEntries([...searchParams]);
 
 	return (
 		<div>
@@ -64,16 +70,16 @@ const Result = () => {
 											ZOOM OUT -
 										</button>
 										<button
-											className='rounded px-2 py-1 border border-[#1e3a8a] bg-[#1e3a8a] text-white text-xs hover:opacity-90 hover:transition-opacity'
+											className='rounded px-2 py-1 border border-[#dcdde1] bg-[#1e3a8a] text-white text-xs hover:opacity-90 hover:transition-opacity'
 											onClick={() => resetTransform()}
 										>
 											RESET
 										</button>
 									</div>
-									<div className='border'>
+									<div className='border h-[80vh] overflow-auto'>
 										<TransformComponent>
 											<img
-												className='w-full'
+												className='w-full h-full object-cover'
 												src={data.image_url}
 												alt='document page'
 											/>
@@ -85,32 +91,60 @@ const Result = () => {
 					</div>
 					{/* Tables */}
 					<div className='ml-[50%] w-[50%] overflow-auto'>
-						{allTables.map((table, i) => {
+						{allTables.map((table, tableIndex) => {
 							return (
-								<div key={i} className='border mb-4 overflow-auto'>
+								<div key={tableIndex} className='border mb-4 overflow-auto'>
 									<h3 className='text-md text-center my-2 font-semibold'>
-										Table {i + 1}
+										Table {tableIndex + 1}
 									</h3>
-									<table>
-										<tbody>
-											{table[1].map((tab, i) => {
-												return (
-													<tr key={i}>
-														{tab.map((t, i) => {
-															return (
-																<td
-																	key={i}
-																	className='border border-[#ddd] p-2 text-xs'
-																>
-																	{t}
-																</td>
-															);
-														})}
-													</tr>
-												);
-											})}
-										</tbody>
-									</table>
+									<>
+										<table>
+											<tbody>
+												{table[1].map((tab, tabRow) => {
+													return (
+														<tr key={tabRow}>
+															{tab.map((cell, cellValue) => {
+																return (
+																	<td
+																		key={cellValue}
+																		className='border border-[#ddd] p-2 text-xs'
+																	>
+																		<input
+																			className='h-7 text-xs border-transparent'
+																			type='text'
+																			value={
+																				allTables[tableIndex][1][tabRow][
+																					cellValue
+																				]
+																			}
+																			onChange={(e) =>
+																				handleChange(
+																					e,
+																					tableIndex,
+																					tabRow,
+																					cellValue
+																				)
+																			}
+																		/>
+																	</td>
+																);
+															})}
+														</tr>
+													);
+												})}
+											</tbody>
+										</table>
+										<button className='rounded my-4 ml-4 px-2 py-2 border border-[#dcdde1] bg-[#1e3a8a] text-white text-xs hover:opacity-90 hover:transition-opacity'>
+											<CSVLink
+												filename={`${year}_${month}_${page}_Table_${
+													tableIndex + 1
+												}.csv`}
+												data={allTables[tableIndex][1]}
+											>
+												Export to CSV
+											</CSVLink>
+										</button>
+									</>
 								</div>
 							);
 						})}

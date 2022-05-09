@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { months } from '../data';
 import Backdrop from '../components/Backdrop';
 import CloseIcon from '../components/CloseIcon';
 import Loading from '../components/Loading';
@@ -39,23 +38,22 @@ const Home = () => {
 	};
 
 	useEffect(() => {
-		setData(Object.entries(months.years));
+		const fetchData = async () => {
+			setLoading(true);
+			try {
+				const { data } = await axios.post(
+					'http://127.0.0.1:5000/?action=list_years',
+					{}
+				);
+				setData(Object.entries(data.years));
+				setLoading(false);
+			} catch (error) {
+				console.log(error);
+				setLoading(false);
+			}
+		};
+		fetchData();
 	}, []);
-
-	// useEffect(() => {
-	// 	const fetchData = async () => {
-	// 		try {
-	// 			const { data } = await axios.post(
-	// 				'http://127.0.0.1:5000/?action=list_years',
-	// 				{}
-	// 			);
-	// 			console.log(data);
-	// 		} catch (error) {
-	// 			console.log(error);
-	// 		}
-	// 	};
-	// 	fetchData();
-	// }, []);
 
 	return (
 		<>

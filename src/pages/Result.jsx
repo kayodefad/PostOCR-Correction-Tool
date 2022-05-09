@@ -48,7 +48,7 @@ const Result = () => {
 			{loading && <Loading />}
 			{data && (
 				<div className='w-full'>
-					<div className='fixed w-[40%]'>
+					<div className='fixed w-[42%]'>
 						<TransformWrapper
 							initialScale={1}
 							initialPositionX={0}
